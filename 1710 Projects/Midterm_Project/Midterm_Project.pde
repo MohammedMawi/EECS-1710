@@ -1,4 +1,5 @@
-Spikes collide;
+Spikes gameOver;
+Score scoreBoard;
 ArrayList<Spikes> spikes;
 
 PImage bird, bird2, currentBird, bg;
@@ -10,6 +11,8 @@ float speedUp = 0.3;
 int imageWidth = 68;
 int imageHeight = 39;
 int score = 0;
+
+boolean isGameOver = false;
  
 void setup(){
   size(700,800);
@@ -17,7 +20,8 @@ void setup(){
   frameRate(60);  
   
   //initialize classes
-  collide = new Spikes();
+  gameOver = new Spikes();
+  scoreBoard = new Score();
   spikes = new ArrayList<Spikes>();
   
   //add 5 spikes to the walls
@@ -36,7 +40,7 @@ void setup(){
   bird.resize(imageWidth,imageHeight);
   bird2.resize(imageWidth,imageHeight);
   currentBird.resize(imageWidth,imageHeight);
-  bg.resize(700,800);
+  bg.resize(width,height);
   
   //initializing vectors
   pos = new PVector(width/2,height/4);
@@ -48,47 +52,9 @@ void setup(){
 
 void draw(){
   background(bg);
-  
-   //if statement to resize score
-   if(score < 10){
-     //circle behind score
-    fill(255,255,255,127);
-    ellipse(width/2+5, height/2-50, 300, 300);
     
-    //display score
-    push();
-    translate(width/2-55,height/2);
-    fill(0);
-    scale(15);
-    text(score,0,0);
-    pop();
-   }
-   else if(score/10 < 10){
-    //circle behind score
-    fill(255,255,255,127);
-    ellipse(width/2+5, height/2-50, 300, 300);
-    
-    //display score
-    push();
-    translate(width/2-110,height/2);
-    fill(0);
-    scale(15);
-    text(score,0,0);
-    pop();
-   }
-   else{
-    //circle behind score
-    fill(255,255,255,127);
-    ellipse(width/2+5, height/2-50, 300, 300);
-    
-    //display score
-    push();
-    translate(width/2-130,height/2);
-    fill(0);
-    scale(12);
-    text(score,0,0);
-    pop();
-   }
+   //display score
+   scoreBoard.show();
   
   //add speed to position to make image move. Also add acceleration to speed to make it accelerate towards the ground
   pos.add(speed);
@@ -125,24 +91,8 @@ void draw(){
   
   //game over if image goes too high or too low
   if(pos.y >= height-30 || pos.y <= 30){
-    background(0);
-  
-    push();
-    translate(width/2-190, height/3);
-    scale(6);
-    fill(255,0,0);
-    text("GAME OVER", 0, 0);
-    pop();
-    
-    push();
-    translate(width/2-120, height/2);
-    scale(3);
-    fill(255);
-    text("Your Score: "+score, 0, 0);
-    pop();
-    
-    speed.x = 0;
-    speed.y = 0;
+     gameOver.screen2();
+     isGameOver = true;
   }
   
   //display image and print speed in console
@@ -153,13 +103,13 @@ void draw(){
 
 //CONTROLS
 void keyPressed(){
-  if(key == ' '){
+  if(key == ' ' && !isGameOver){
     speed.y = -7;
   }
 }
 
 void mousePressed(){
-  if(mousePressed){
+  if(mousePressed && !isGameOver){
     speed.y = -7;
   }
 }
