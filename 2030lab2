@@ -20,7 +20,10 @@ public class Encryption {
 	
 	public static void main(String[] args) {
 		
-		System.out.println(encrypt("IN CRYPTOGRAPHY, A SUBSTITUTION CIPHER IS A METHOD OF ENCODING B", "ABCDEFGH"));
+		String encryptedText = encrypt("IN CRYPTOGRAPHY, A SUBSTITUTION CIPHER IS A METHOD OF ENCODING B", "ABCDEFGH");
+		System.out.println(encryptedText);
+		
+		System.out.println(decrypt(encryptedText, "ABCDEFGH"));
 		
 	}
 
@@ -68,8 +71,7 @@ public class Encryption {
 			pattern[index1] = pattern[index2];
 			pattern[index2] = temp;
 			
-		}
-		
+		}		
 				
 		//creating new empty string to add scrambled letters into
 		StringBuilder scramble64 = new StringBuilder("");
@@ -96,46 +98,88 @@ public class Encryption {
 		    }
 			
 		}
-				
+		
+		//if statement to add "O" if string length is not a multiple of 64
+        if (scramble64.length()%64 != 0){
+            int paddingLength = 64 - (scramble64.length() % 64);
+
+            for (int i = 0; i < paddingLength; i++) {
+                scramble64.append("O");
+            }
+        }
+		
 		//creating 2D array, 8x8, 8 rows 8 columns
 		char [][] transpo = new char [8][8];
 		
-		//for loop that adds shuffled letters into 2D array
-		//outer loop iterates between rows
-		for(int i = 0; i < transpo.length; i++) {
-			
-			//gets 8 letters from string each iteration using substring(startIndex, endIndex)
-			/*Example: first iteration i = 0, 
-			  startIndex: 0 * 8 = 0, endIndex: (0 * 8) + 8 = 8
-			  substring(0,8)
-			  gets characters from 0th index (inclusive) to 8th index (exclusive) */
-			String cut = scramble64.substring(i * 8, (i * 8) + 8);
-			
-			//adding characters to jth column in i-th row
-			for(int j = 0; j < transpo[i].length; j++) {
-				transpo[i][j] = cut.charAt(j);
-			}
-			
-			System.out.println(Arrays.toString(transpo[i]));
-			
-		}
-		
-		//new string to add letter from columns of 2D array corresponding to the pattern array
+		//creating an empty string to put the columned elements in
 		String shuffle = "";
-				
-		//loop to iterate through columns to be added to string
-		for (int i = 0; i < transpo.length; i++) {
+		
+        //outer loop to run multiple of 64 times. Ex. if string length is 256, it will run 4 times
+        for (int i = 0; i < scramble64.length()/64; i++) {
+        	        	
+			//gets chunks of 64 letters from the string each iteration using substring(startIndex, endIndex)
+			/*Example: first iteration i = 0, 
+			  startIndex: 0 * 64 = 0, endIndex: (0 * 64) + 64 = 64
+			  substring(0,64)
+			  gets characters from 0th index (inclusive) to 64th index (exclusive) */
+            String cut = scramble64.substring(i * 64, (i * 64) +64);
 
-			//adding column of letters to the string based on the index number in the pattern array
-			for (int j = 0; j < transpo[i].length; j++) {
-                shuffle += transpo[j][pattern[i]];
-            }		
-        }
-				
+            //for loop to iterate through each row of 2D array
+            for (int j = 0; j < transpo.length; j++) {
+            	
+            	//using substring to get chunks of 8 characters each time
+            	//apply same concept as above but with chunks of 8
+                String cut2 = cut.substring(j * 8, (j * 8) + 8);
+
+                //inner loop to iterate through each column of jth row
+                for (int s = 0; s < transpo[j].length; s++) {
+                	//adding character from cut substring into 2D array
+                    transpo[j][s] = cut2.charAt(s);
+                }
+            }
+                        
+            //taking columns of in this order [3, 2, 7, 4, 1, 0, 5, 6]
+            //appending those columns into a string;
+            for (int k = 0; k < transpo.length; k++) {
+                for (int l = 0; l < transpo[k].length; l++) {
+                    shuffle += transpo[l][pattern[k]];
+                }
+            }
+        }	
+        System.out.println();
+
 		return shuffle;
 	}
+	
+	
 
 	public static String decrypt(String textToDecrypt, String key) {
+		
+		char [][] transpo = new char [8][8];
+		char [][] transpo2 = new char [8][8];
+		int index = 0;
+		
+		int [] pattern = {5, 4, 1, 0, 3, 6, 7, 2};
+		
+		for(int i = 0; i < textToDecrypt.length()/64; i++) {
+			String cut = textToDecrypt.substring(i * 64, (i* 64) + 64);
+			
+			for(int j = 0; j < transpo.length; j++) {
+				
+				String cut2 = cut.substring(j * 8, (j* 8) + 8);
+				for(int s = 0; s < transpo[j].length; s++) {
+					transpo[j][s] = cut2.charAt(s);
+				}
+			}
+			
+			for(int j = 0; j < transpo.length; j++) {
+                for(int k = 0; k < transpo[j].length; k++) {
+                    transpo2[j][k] += transpo[pattern[k]][j];
+                }
+                System.out.println(Arrays.toString(transpo2[j]));
+            }
+		}
+		
 		return textToDecrypt;
 	}
 
