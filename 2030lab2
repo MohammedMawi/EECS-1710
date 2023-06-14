@@ -14,13 +14,11 @@ import java.util.ArrayList;
  */
 public class Encryption {
 	
-	
-	
 	private final static String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
 	
 	public static void main(String[] args) {
 		
-		String encryptedText = encrypt("IN CRYPTOGRAPHY, A SUBSTITUTION CIPHER IS A METHOD OF ENCODING BY WHICH UNITS OF PLAINTEXT ARE REPLACED WITH CIPHERTEXT, ACCORDING TO A FIXED SYSTEM; THE \"UNITS\" MAY BE SINGLE LETTERS (THE MOST COMMON), PAIRS OF LETTERS, TRIPLETS OF LETTERS, MIXTURES OF THE ABOVE, AND SO FORTH. THE RECEIVER DECIPHERS THE TEXT BY PERFORMING THE INVERSE SUBSTITUTION", "ABCDEFGH");
+		String encryptedText = encrypt("In cryptography, a substitution cipher is a method of encoding b", "ABCDEFGH");
 		System.out.println(encryptedText);
 		
 		System.out.println(decrypt(encryptedText, "ABCDEFGH"));
@@ -31,6 +29,8 @@ public class Encryption {
 		
 		//getting hash code of key variable
 		int hash = key.hashCode();
+		
+		String textToEncrypt2 = textToEncrypt.toUpperCase();
 		
 		//using hash value of key variable to initialize Random object
 		Random random = new Random(hash);
@@ -76,10 +76,10 @@ public class Encryption {
 		//creating new empty string to add scrambled letters into
 		StringBuilder scramble64 = new StringBuilder("");
 		
-		for(int i = 0; i < textToEncrypt.length(); i++) {
+		for(int i = 0; i < textToEncrypt2.length(); i++) {
 			
 			//get letter at index i from 64 character string
-			char letter = textToEncrypt.charAt(i);
+			char letter = textToEncrypt2.charAt(i);
 			
 			//use letter to get index # from ALPHABET variable
 			int index = ALPHABET.indexOf(letter);
@@ -92,14 +92,15 @@ public class Encryption {
 				//add that letter to scramble64 string
 				scramble64.append(letter2);
 		    } 
-			//if character is not found in the alphabet it will return -1, add letter "O"
+//			if character is not found in the alphabet it will return -1, add add last letter from newAlphabet
 			else {
-		        scramble64.append("O");
+				char lastLetter = newAlphabet.charAt(newAlphabet.length()-1);
+				
+				scramble64.append(lastLetter);
 		    }
 			
 		}
-//		System.out.println(scramble64);
-		
+				
 		//if statement to add "O" if string length is not a multiple of 64
         if (scramble64.length()%64 != 0){
             int paddingLength = 64 - (scramble64.length() % 64);
@@ -159,8 +160,39 @@ public class Encryption {
 		char [][] transpo = new char [8][8];
 		char [][] transpo2 = new char [8][8];
 		
+		
+
 		int [] pattern = {5, 4, 1, 0, 3, 6, 7, 2};
 		String shuffle = "";
+		
+		//getting hash code of key variable
+		int hash = key.hashCode();
+		
+		//turn ALPHABET into an array of chars
+	    char[] alphabetArray = ALPHABET.toCharArray(); 	
+		
+		//check if inputed String is a multiple of 64
+		//if not, throw an IllegalArgumentException
+		if(textToDecrypt.length()%64 != 0) {			
+			throw new IllegalArgumentException("Invalid number of characters. Number of characters need to be multiple of 64");
+		}
+		
+		//check if inputed String does not contain any special characters
+		//if so, throw an IllegalArgumentException
+		for(int i = 0; i < textToDecrypt.length(); i++) {
+			
+			//get letter at index i from 64 character string
+			char letter = textToDecrypt.charAt(i);
+			
+			//use letter to get index # from ALPHABET variable
+			int index = ALPHABET.indexOf(letter);
+			
+			//if character is NOT found in the alphabet it will return -1
+			if (index == -1) {
+				throw new IllegalArgumentException("Invalid character in String. Letters or space only allowed");
+			}
+			
+		}
 		
 		for(int i = 0; i < textToDecrypt.length()/64; i++) {
 			String cut = textToDecrypt.substring(i * 64, (i* 64) + 64);
@@ -171,13 +203,14 @@ public class Encryption {
 				for(int k = 0; k < transpo[j].length; k++) {
 					transpo[j][k] = cut2.charAt(k);
 				}
+				System.out.println(Arrays.toString(transpo[j]));
 			}
-			
+			System.out.println();
 			for(int j = 0; j < transpo.length; j++) {
                 for(int k = 0; k < transpo[j].length; k++) {
                     transpo2[j][k] = transpo[pattern[k]][j];
                 }
-                
+                System.out.println(Arrays.toString(transpo2[j]));
             }
 			
 			for(int j = 0; j < transpo.length; j++) {
@@ -187,21 +220,15 @@ public class Encryption {
 			}
 		}
 		
-		//getting hash code of key variable
-		int hash = key.hashCode();
-		
 		//using hash value of key variable to initialize Random object
-		Random random = new Random(hash);
-		
-		//turn ALPHABET into an array of chars
-	    char[] alphabetArray = ALPHABET.toCharArray(); 	
+		Random random2 = new Random(hash);
 		
 		//for loop to swap the characters in the ALPHABET variable 100 times
 		for(int i = 0; i < 100; i++) {
 			
 			//storing random numbers from 0 - 26
-			int index1 = random.nextInt(0, 27);
-			int index2 = random.nextInt(0, 27);
+			int index1 = random2.nextInt(0, 27);
+			int index2 = random2.nextInt(0, 27);
 						
 			//swapping characters
 			char temp = alphabetArray[index1];
