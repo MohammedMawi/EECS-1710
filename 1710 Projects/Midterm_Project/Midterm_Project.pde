@@ -1,4 +1,4 @@
-Spikes gameOver;
+Spikes game;
 Score scoreBoard;
 ArrayList<Spikes> spikes;
 
@@ -12,7 +12,7 @@ int imageWidth = 68;
 int imageHeight = 39;
 int score = 0;
 
-boolean isGameOver = false;
+int gameState = 0;
  
 void setup(){
   size(700,800);
@@ -20,7 +20,7 @@ void setup(){
   frameRate(60);  
   
   //initialize classes
-  gameOver = new Spikes();
+  game = new Spikes();
   scoreBoard = new Score();
   spikes = new ArrayList<Spikes>();
   
@@ -51,65 +51,102 @@ void setup(){
 }
 
 void draw(){
-  background(bg);
+  if(gameState == 0){
+    game.screen1();
+  }
+  
+  if(gameState == 1){
+    background(bg);
     
-   //display score
-   scoreBoard.show();
-  
-  //add speed to position to make image move. Also add acceleration to speed to make it accelerate towards the ground
-  pos.add(speed);
-  speed.add(acc);
-  
-  //when image bounces on the wall, flip the image, make it go backwards, speed it up, and add 1 point to the score board
-  if(pos.x >= width){
-    currentBird = bird2;
-
-    speed.x *= -1;
-    speed.x -= speedUp;
-    score += 1;
-  }
-  else if(pos.x <= 0){
-    currentBird = bird;
+    //display score
+    scoreBoard.show();
     
-    speed.x *= -1;
-    speed.x += speedUp;
-    score += 1;
+    //add speed to position to make image move. Also add acceleration to speed to make it accelerate towards the ground
+    pos.add(speed);
+    speed.add(acc);
+    
+    //when image bounces on the wall, flip the image, make it go backwards, speed it up, and add 1 point to the score board
+    if(pos.x >= width){
+      currentBird = bird2;
+  
+      speed.x *= -1;
+      speed.x -= speedUp;
+      score += 1;
+    }
+    else if(pos.x <= 0){
+      currentBird = bird;
+      
+      speed.x *= -1;
+      speed.x += speedUp;
+      score += 1;
+    }
+    
+    //limit image speed to 15
+    if(speed.x >= 15){
+      speed.x = 15;
+      speedUp = 0;
+    }
+    
+    //use all 5 spikes at once
+    for(Spikes s: spikes){
+      s.display();
+      s.update();
+      s.collide();
+    }
+    
+    //game over if image goes too high or too low
+    if(pos.y >= height-30 || pos.y <= 30){
+       game.screen2();
+       gameState = 2;
+    }
+    
+    
   }
   
-  //limit image speed to 15
-  if(speed.x >= 15){
-    speed.x = 15;
-    speedUp = 0;
-  }
-  
-  //use all 5 spikes at once
-  for(Spikes s: spikes){
-    s.display();
-    s.update();
-    s.collide();
-  }
-  
-  //game over if image goes too high or too low
-  if(pos.y >= height-30 || pos.y <= 30){
-     gameOver.screen2();
-     isGameOver = true;
-  }
   
   //display image and print speed in console
   image(currentBird, pos.x, pos.y);
   println(speed.x);
   
+  println(gameState);
+  
 }
 
 //CONTROLS
 void keyPressed(){
-  if(key == ' ' && !isGameOver){
+  if(key == ' ' && gameState != 2){
     speed.y = -7;
+  }
+  
+  if(gameState == 0){
+    gameState = 1;
+  }
+  
+  if(gameState == 2){
+    gameState = 1;
+    currentBird = bird;
+    pos.x = width/2;
+    pos.y = height/4;
+    speed.x = 4;
+    score = 0;
   }
 }
 
 void mousePressed(){
-  if(mousePressed && !isGameOver){
+  if(mousePressed && gameState != 2){
     speed.y = -7;
+  }
+  
+  if(gameState == 0){
+    gameState = 1;
+  }
+  
+  if(gameState == 2){
+    gameState = 1;
+    currentBird = bird;
+    pos.x = width/2;
+    pos.y = height/4;
+    speed.x = 4;
+    score = 0;
   }
 }

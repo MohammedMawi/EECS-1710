@@ -36,11 +36,24 @@ class Spikes{
   void collide(){
     if(pos.dist(spikePos) < 37 || pos.dist(spikePos2) < 37){
      screen2();
-     isGameOver = true;
+     gameState = 2;
     }
     
   }
   
+  //START SCREEN
+  void screen1(){
+    background(bg);
+    
+    push();
+    translate(width/2-280, height/2);
+    scale(6);
+    fill(0,0,0);
+    text("CLICK TO START", 0, 0);
+    pop();
+  }
+  
+  //GAME OVER SCREEN
   void screen2(){
     background(0);
   
@@ -56,6 +69,13 @@ class Spikes{
     scale(3);
     fill(255);
     text("Your Score: "+score, 0, 0);
+    pop();
+    
+    push();
+    translate(width/2-160, height/1.75);
+    scale(3);
+    fill(255);
+    text("Click To Try Again", 0, 0);
     pop();
     
     speed.x = 0;
